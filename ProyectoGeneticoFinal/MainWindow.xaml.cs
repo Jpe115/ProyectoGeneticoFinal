@@ -80,6 +80,22 @@ namespace ProyectoGeneticoFinal
             }
         }
 
+        private void ObtenerDistancias()
+        {
+            cantidadPuntos = coordenadas.Count;
+            distancias = new int[cantidadPuntos, cantidadPuntos];
+            int x1, x2, y1, y2;
+            for (int a = 0; a < cantidadPuntos; a++)
+                for (int b = 0; b < cantidadPuntos; b++)
+                {
+                    x1 = coordenadas[a].Item1;
+                    y1 = coordenadas[a].Item2;
+                    x2 = coordenadas[b].Item1;
+                    y2 = coordenadas[b].Item2;
+                    distancias[a, b] = Convert.ToInt32(Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2)));
+                }
+        }
+
         #region Población
         private void InicializarPoblación(int[,] pob)
         {
