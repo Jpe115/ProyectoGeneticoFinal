@@ -50,6 +50,7 @@ namespace ProyectoGeneticoFinal
         private int criterioParo = 100;
         private TipoCruzamiento cruzamiento;
         private TipoMutación mutación;
+        private int cantidadDePuntosEntre2;
         private int[,] aptitudes = new int[32, 30];
         private int[,] tiempos = new int[32, 30];
 
@@ -323,6 +324,57 @@ namespace ProyectoGeneticoFinal
                 }
             }
             return false;
+        }
+        #endregion
+
+        #region Mutación
+        private bool ProcesoMutación(int[,] pob)
+        {
+            if (probMutación >= 1 && probMutación <= 100)
+            {
+                int probabilidad = rand.Next(1, 100);
+                if (probabilidad <= probMutación)
+                {
+                    if (mutación == TipoMutación.Swap)
+                    {
+                        MutaciónSwap(pob);
+                        return true;
+                    }
+                    else
+                    {
+                        MutaciónHSwap(pob);
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        private void MutaciónSwap(int[,] pob)
+        {
+            for (int fila = 0; fila < cantPoblación; fila++)
+            {
+                int[] N1yN2 = ObtenerS1yS2();
+
+                int aux = pob[fila, N1yN2[1]];
+                pob[fila, N1yN2[1]] = pob[fila, N1yN2[0]];
+                pob[fila, N1yN2[0]] = aux;
+            }
+        }
+
+        private void MutaciónHSwap(int[,] pob)
+        {
+            for (int fila = 0; fila < cantPoblación; fila++)
+            {
+                int punto = rand.Next(1, (cantidadPuntos / 2) + 1);
+                int aux = pob[fila, punto];
+                pob[fila, punto] = pob[fila, punto + cantidadDePuntosEntre2];
+                pob[fila, punto + cantidadDePuntosEntre2] = aux;
+            }
         }
         #endregion
 
