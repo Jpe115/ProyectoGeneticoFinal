@@ -49,6 +49,8 @@ namespace ProyectoGeneticoFinal
         private int criterioParo = 100;
         private TipoCruzamiento cruzamiento;
         private TipoMutación mutación;
+        private int[,] aptitudes = new int[32, 30];
+        private int[,] tiempos = new int[32, 30];
 
         public MainWindow()
         {
@@ -56,9 +58,24 @@ namespace ProyectoGeneticoFinal
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        private async void btnEjecutar_Click(object sender, RoutedEventArgs e)
+        private void btnEjecutar_Click(object sender, RoutedEventArgs e)
         {
-            
+            for(int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
+            {
+                for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 1; opcionesCruzamiento++)
+                {
+                    for (int opcionesProbCruzamiento = 80; opcionesProbCruzamiento <= 90; opcionesProbCruzamiento+=10)
+                    {
+                        for (int opcionesMutación = 0; opcionesMutación <= 1; opcionesMutación++)
+                        {
+                            for (int opcionesProbMutación = 20; opcionesProbMutación <= 30; opcionesProbMutación += 10)
+                            {
+
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private async Task<bool> LeerPuntos()
