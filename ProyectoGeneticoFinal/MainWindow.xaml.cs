@@ -160,6 +160,172 @@ namespace ProyectoGeneticoFinal
         }
         #endregion
 
+        #region Cruzamiento
+        private bool ProcesoCruzamiento(int[,] pobContraria, int[,] pob)
+        {
+            if (probCruzamiento >= 0 && probCruzamiento <= 100)
+            {
+                int prob = rand.Next(1, 100);
+                if (prob <= probCruzamiento)
+                {
+                    if (cruzamiento == TipoCruzamiento.TPX)
+                    {
+                        int[] valoresS1yS2 = ObtenerS1yS2();
+                        TwoPointCrossover(true, 1, valoresS1yS2, pob, pobContraria);
+                        TwoPointCrossover(false, -1, valoresS1yS2, pob, pobContraria);
+                        return true;
+                    }
+                    else
+                    {
+                        int S1 = rand.Next(3, cantidadPuntos - 3);
+                        OnePointCrossover(true, 1, S1, pob, pobContraria);
+                        OnePointCrossover(false, -1, S1, pob, pobContraria);
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void OnePointCrossover(bool esPar, int intercambio, int punto, int[,] pob, int[,] pobContraria)
+        {
+            int parImpar = esPar ? 0 : 1;
+
+            //LLenar desde el padre 1 al hijo
+            for (int a = parImpar; a < cantPoblación; a += 2)
+            {
+                //LLenar desde el padre 1 al hijo
+                for (int b = 1; b <= punto; b++)
+                {
+                    //Pasar todos los elementos del padre 1 dentro de los rangos, al hijo
+                    pob[a, b] = pobContraria[a, b];
+                }
+
+                //Verificar que no sea duplicado                
+                int fila = a + intercambio;
+                int columna = 1;
+
+                for (int b = 2; b < cantidadPuntos; b++)
+                {
+                    if (!(b <= punto))
+                    {
+                        bool bandera = false;
+                        while (bandera == false && columna < cantidadPuntos)
+                        {
+                            int valorActual = pobContraria[fila, columna];
+
+                            if (!EsDuplicado(a, valorActual, punto, pobContraria))
+                            {
+                                pob[a, b] = valorActual;
+                                bandera = true;
+                            }
+                            else
+                            {
+                                columna++;
+                            }
+                        }
+                        columna++;
+                    }
+                }
+            }
+        }
+
+        private bool EsDuplicado(int a, int valor, int punto, int[,] pobContraria)
+        {
+            for (int col = 1; col <= punto; col++)
+            {
+                if (pobContraria[a, col] != 0)
+                {
+                    if (pobContraria[a, col] == valor)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private int[] ObtenerS1yS2()
+        {
+            int S1 = rand.Next(1, cantidadPuntos - 3);
+            int S2 = rand.Next(S1 + 1, cantidadPuntos);
+
+            int[] valoresS1yS2 = { S1, S2 };
+            return valoresS1yS2;
+        }
+
+        private void TwoPointCrossover(bool esPar, int intercambio, int[] valoresS1yS2, int[,] pob, int[,] pobContraria)
+        {
+            int parImpar = esPar ? 0 : 1;
+
+            //LLenar desde el padre 1 al hijo
+            for (int a = parImpar; a < cantPoblación; a += 2)
+            {
+                //LLenar desde el padre 1 al hijo
+                for (int b = 1; b < cantidadPuntos + 2; b++)
+                {
+                    if (b <= valoresS1yS2[0] || b >= valoresS1yS2[1])
+                    {
+                        //Pasar todos los elementos del padre 1 dentro de los rangos, al hijo
+                        pob[a, b] = pobContraria[a, b];
+                    }
+                }
+
+                //Verificar que no sea duplicado                
+                int fila = a + intercambio;
+                int columna = 1;
+
+                for (int b = 2; b < cantidadPuntos; b++)
+                {
+                    if (!(b <= valoresS1yS2[0] || b >= valoresS1yS2[1]))
+                    {
+                        bool bandera = false;
+                        while (bandera == false && columna < cantidadPuntos)
+                        {
+                            int valorActual = pobContraria[fila, columna];
+
+                            if (!EsDuplicado(a, valorActual, valoresS1yS2, pobContraria))
+                            {
+                                pob[a, b] = valorActual;
+                                bandera = true;
+                            }
+                            else
+                            {
+                                columna++;
+                            }
+                        }
+                        columna++;
+                    }
+                }
+            }
+        }
+
+        private bool EsDuplicado(int a, int valor, int[] valoresS1yS2, int[,] pobContraria)
+        {
+            for (int col = 1; col < cantidadPuntos; col++)
+            {
+                if (pobContraria[a, col] != 0)
+                {
+                    if (col <= valoresS1yS2[0] || col >= valoresS1yS2[1])
+                    {
+                        if (pobContraria[a, col] == valor)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        #endregion
+
         private async Task<bool> LeerPuntos()
         {
             string nombreArchivo = "D:\\Documentos\\Visual Studio\\ProyectoGenetico\\ProyectoGenetico\\bin\\Debug\\net7.0-windows10.0.17763.0\\CoordenadasGuardadas.json";
