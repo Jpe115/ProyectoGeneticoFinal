@@ -43,6 +43,7 @@ namespace ProyectoGeneticoFinal
         private int[,] distancias = new int[15, 15];      
         private int[,] Población = new int[1, 1];
         private int[,] Población2 = new int[1, 1];
+        private int mejorAptitud;
         private int probCruzamiento;
         private int probMutación;
         private bool esPob1Actual = true;
@@ -78,6 +79,87 @@ namespace ProyectoGeneticoFinal
             }
         }
 
+        #region Población
+        private void InicializarPoblación(int[,] pob)
+        {
+            for (int a = 0; a < cantPoblación; a++)
+            {
+                for (int b = 0; b < cantidadPuntos; b++)
+                {
+                    pob[a, b] = b;
+                }
+                pob[a, 0] = 0;
+            }
+        }
+
+        private void GenerarPobInicial(int[,] pob)
+        {
+            for (int a = 0; a < cantPoblación; a++)
+            {
+                for (int b = 1; b < cantidadPuntos; b++)
+                {
+                    int temp = pob[a, b];
+                    int random = rand.Next(1, cantidadPuntos - 1);
+                    pob[a, b] = pob[a, random];
+                    pob[a, random] = temp;
+
+                }
+                pob[a, cantidadPuntos] = 0;
+                pob[a, cantidadPuntos + 1] = 0;
+            }
+        }
+
+        private void CalcularAptitud(int[,] pob)
+        {
+            for (int a = 0; a < cantPoblación; a++)
+            {
+                int aptitud = 0;
+                for (int b = 1; b < cantidadPuntos; b++)
+                {
+                    aptitud += distancias[pob[a, b], pob[a, b + 1]];
+                }
+                pob[a, cantidadPuntos + 1] = aptitud;
+            }
+        }
+        #endregion
+
+        private void ProcesoSelección(int[,] pob, int[,] pobContraria)
+        {
+            for (int a = 0; a < cantPoblación; a++)
+            {
+                int r = rand.Next(0, cantPoblación - 1);
+                if (pob[a, cantidadPuntos + 1] < pob[r, cantidadPuntos + 1])
+                {
+                    CopiarSolucion(a, a, pob, pobContraria);
+                }
+                else
+                {
+                    CopiarSolucion(r, a, pob, pobContraria);
+                }
+            }
+        }
+
+        #region Búsqueda de soluciones
+        private void CopiarSolucion(int filaGanadora, int filaActual, int[,] pob, int[,] pobContraria)
+        {
+            for (int a = 0; a < cantidadPuntos + 2; a++)
+            {
+                pobContraria[filaActual, a] = pob[filaGanadora, a];
+            }
+        }
+
+        private void BuscarMejorSolución(int[,] pob)
+        {
+            for (int fila = 0; fila < cantPoblación; fila++)
+            {
+                if (pob[fila, cantidadPuntos + 1] < mejorAptitud)
+                {
+                    mejorAptitud = pob[fila, cantidadPuntos + 1];
+                }
+            }
+        }
+        #endregion
+
         private async Task<bool> LeerPuntos()
         {
             string nombreArchivo = "D:\\Documentos\\Visual Studio\\ProyectoGenetico\\ProyectoGenetico\\bin\\Debug\\net7.0-windows10.0.17763.0\\CoordenadasGuardadas.json";
@@ -100,6 +182,19 @@ namespace ProyectoGeneticoFinal
             {
                 MessageBox.Show(ex.Message);
                 return false;
+            }
+        }
+
+        private async Task GuardarDatosExcel(int aptitud, string tiempo)
+        {
+            string rutaArchivo = "D:\\Escuela\\7 Semestre\\Algoritmos metaheuristicos\\Experimento_AG.xlsx";
+
+            using (var package = new ExcelPackage(new FileInfo(rutaArchivo)))
+            {
+                var worksheet = package.Workbook.Worksheets[0];
+                worksheet.Cells[5, 7].Value = "asdfg";
+
+                await package.SaveAsync();
             }
         }
 
