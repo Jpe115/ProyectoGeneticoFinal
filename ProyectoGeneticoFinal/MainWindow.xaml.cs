@@ -56,9 +56,9 @@ namespace ProyectoGeneticoFinal
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        private void btnEjecutar_Click(object sender, RoutedEventArgs e)
+        private async void btnEjecutar_Click(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private async Task<bool> LeerPuntos()
@@ -76,10 +76,6 @@ namespace ProyectoGeneticoFinal
                         coordenadas = listaCoordenadas;
                         return true;
                     }
-                    else
-                    {
-                        MessageBox.Show("No se ha encontrado una lista de ciudades", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
                 }
                 return false;
             }
@@ -87,6 +83,16 @@ namespace ProyectoGeneticoFinal
             {
                 MessageBox.Show(ex.Message);
                 return false;
+            }
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            bool lecturaHecha = await LeerPuntos();
+            if (lecturaHecha == false)
+            {
+                MessageBox.Show("No se ha encontrado una lista de ciudades", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.Current.Shutdown();
             }
         }
     }

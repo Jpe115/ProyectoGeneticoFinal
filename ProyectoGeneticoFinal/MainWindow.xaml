@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProyectoGeneticoFinal"
         mc:Ignorable="d"
-        Title="MainWindow" Height="250" Width="400" WindowStartupLocation="CenterScreen">
+        Title="MainWindow" Height="250" Width="400" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Grid>
         <Button VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" 
                 Background="LightSeaGreen" Click="btnEjecutar_Click" x:Name="btnEjecutar"
