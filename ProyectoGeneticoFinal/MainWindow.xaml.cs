@@ -77,7 +77,7 @@ namespace ProyectoGeneticoFinal
                         {
                             for (int opcionesProbMutación = 20; opcionesProbMutación <= 30; opcionesProbMutación += 10)
                             {
-                                for (int i = 1; i < 31; i++)
+                                for (int i = 7; i < 37; i++)
                                 {
                                     await EjecutarAlgoritmo(opcionesPoblación, opcionesCruzamiento, opcionesProbCruzamiento, opcionesMutación, opcionesProbMutación, i, fila);
                                 }
