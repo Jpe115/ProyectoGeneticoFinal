@@ -118,7 +118,11 @@ namespace ProyectoGeneticoFinal
 
             mejorAptitud = 999999999;
             Población = new int[cantPoblación, cantidadPuntos + 2];
-            Población2 = new int[cantPoblación, cantidadPuntos + 2];            
+            Población2 = new int[cantPoblación, cantidadPuntos + 2];
+
+            //Redondear en caso de ser necesario para la mutación switch2
+            cantidadDePuntosEntre2 = (int)Math.Ceiling((double)cantidadPuntos / 2);
+            cantidadDePuntosEntre2--;
 
             await Task.Run(() => {
                 InicializarPoblación(Población);
