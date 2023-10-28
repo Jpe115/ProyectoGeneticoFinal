@@ -41,7 +41,7 @@ namespace ProyectoGeneticoFinal
         private List<(int, int)> coordenadas = new List<(int, int)>();
         private int cantidadPuntos = 15;
         private int cantPoblación;
-        private int[,] distancias = new int[15, 15];      
+        private int[,] distancias = new int[15, 15];
         private int[,] Población = new int[1, 1];
         private int[,] Población2 = new int[1, 1];
         private int mejorAptitud;
@@ -65,7 +65,8 @@ namespace ProyectoGeneticoFinal
         {
             Cursor = Cursors.Wait;
             await Task.Run(ObtenerDistancias);
-            
+
+            int fila = 5;
             for (int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
             {
                 for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 1; opcionesCruzamiento++)
@@ -78,8 +79,9 @@ namespace ProyectoGeneticoFinal
                             {
                                 for (int i = 1; i < 31; i++)
                                 {
-                                    await EjecutarAlgoritmo(opcionesPoblación, opcionesCruzamiento, opcionesProbCruzamiento, opcionesMutación, opcionesProbMutación);
+                                    await EjecutarAlgoritmo(opcionesPoblación, opcionesCruzamiento, opcionesProbCruzamiento, opcionesMutación, opcionesProbMutación, i, fila);
                                 }
+                                fila++;
                             }
                         }
                     }
@@ -90,7 +92,7 @@ namespace ProyectoGeneticoFinal
         }
 
         private async Task EjecutarAlgoritmo(int opcionesPoblación, int opcionesCruzamiento, 
-            int opcionesProbCruzamiento, int opcionesMutación, int opcionesProbMutación)
+            int opcionesProbCruzamiento, int opcionesMutación, int opcionesProbMutación, int repetición, int fila)
         {
             int ciclo = 0;
 
@@ -193,7 +195,7 @@ namespace ProyectoGeneticoFinal
             TimeSpan total = después - antes;
             string tiempo = total.TotalSeconds.ToString();
             
-            await GuardarDatosExcel(mejorAptitud, tiempo);
+            await GuardarDatosExcel(mejorAptitud, tiempo, repetición, fila);
         }
 
         private void ObtenerDistancias()
@@ -535,14 +537,17 @@ namespace ProyectoGeneticoFinal
             }
         }
 
-        private async Task GuardarDatosExcel(int aptitud, string tiempo)
+        private async Task GuardarDatosExcel(int aptitud, string tiempo, int columna, int fila)
         {
             string rutaArchivo = "D:\\Escuela\\7 Semestre\\Algoritmos metaheuristicos\\Experimento_AG.xlsx";
 
             using (var package = new ExcelPackage(new FileInfo(rutaArchivo)))
             {
-                var worksheet = package.Workbook.Worksheets[0];
-                worksheet.Cells[5, 7].Value = "asdfg";
+                var worksheetAptitud = package.Workbook.Worksheets[0];
+                worksheetAptitud.Cells[fila, columna].Value = aptitud;
+
+                var worksheetTiempo = package.Workbook.Worksheets[1];
+                worksheetTiempo.Cells[fila, columna].Value = tiempo;
 
                 await package.SaveAsync();
             }
