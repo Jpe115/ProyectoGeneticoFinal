@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading;
 
 namespace ProyectoGeneticoFinal
 {
@@ -60,9 +61,12 @@ namespace ProyectoGeneticoFinal
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        private void btnEjecutar_Click(object sender, RoutedEventArgs e)
+        private async void btnEjecutar_Click(object sender, RoutedEventArgs e)
         {
-            for(int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
+            Cursor = Cursors.Wait;
+            await Task.Run(ObtenerDistancias);
+            
+            for (int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
             {
                 for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 1; opcionesCruzamiento++)
                 {
@@ -78,6 +82,115 @@ namespace ProyectoGeneticoFinal
                     }
                 }
             }
+            Cursor = Cursors.Arrow;
+            MessageBox.Show("¿Desea abrir el archivo resultante?", "Proceso terminado", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        }
+
+        private async Task EjecutarAlgoritmo(int opcionesPoblación, int opcionesCruzamiento, 
+            int opcionesProbCruzamiento, int opcionesMutación, int opcionesProbMutación)
+        {
+            int ciclo = 0;
+
+            cantPoblación = opcionesPoblación;
+            if (opcionesCruzamiento == 0)
+            {
+                cruzamiento = TipoCruzamiento.TPX;
+            }
+            else
+            {
+                cruzamiento = TipoCruzamiento.OPX;
+            }
+            probCruzamiento = opcionesProbCruzamiento;
+            if (opcionesMutación == 0)
+            {
+                mutación = TipoMutación.Swap;
+            }
+            else
+            {
+                mutación = TipoMutación.HSwap;
+            }
+            probMutación = opcionesProbMutación;            
+
+            mejorAptitud = 999999999;
+            Población = new int[cantPoblación, cantidadPuntos + 2];
+            Población2 = new int[cantPoblación, cantidadPuntos + 2];            
+
+            await Task.Run(() => {
+                InicializarPoblación(Población);
+                GenerarPobInicial(Población);
+                CalcularAptitud(Población);
+
+                InicializarPoblación(Población2);
+                GenerarPobInicial(Población2);
+                CalcularAptitud(Población2);
+            });
+
+            DateTime antes = DateTime.Now;
+            do
+            {
+                await Task.Run(() => {
+                    //pobContraria es la población de salida o receptora o donde se guarda lo más nuevo
+                    if (esPob1Actual)
+                    {
+                        ProcesoSelección(Población, Población2);
+                        BuscarMejorSolución(Población2);
+                        esPob1Actual = !esPob1Actual;
+                    }
+                    else
+                    {
+                        ProcesoSelección(Población2, Población);
+                        BuscarMejorSolución(Población);
+                        esPob1Actual = !esPob1Actual;
+                    }
+
+                    //pobContraria es la población de salida o donde se guarda lo más nuevo
+                    if (esPob1Actual)
+                    {
+                        if (ProcesoCruzamiento(Población, Población2))
+                        {
+                            CalcularAptitud(Población2);
+                            BuscarMejorSolución(Población2);
+                            esPob1Actual = !esPob1Actual;
+                        }
+                    }
+                    else
+                    {
+                        if (ProcesoCruzamiento(Población2, Población))
+                        {
+                            CalcularAptitud(Población);
+                            BuscarMejorSolución(Población);
+                            esPob1Actual = !esPob1Actual;
+                        }
+                    }
+
+                    if (esPob1Actual)
+                    {
+                        if (ProcesoMutación(Población))
+                        {
+                            CalcularAptitud(Población);
+                            BuscarMejorSolución(Población);
+                            esPob1Actual = !esPob1Actual;
+                        }
+                    }
+                    else
+                    {
+                        if (ProcesoMutación(Población2))
+                        {
+                            CalcularAptitud(Población2);
+                            BuscarMejorSolución(Población2);
+                            esPob1Actual = !esPob1Actual;
+                        }
+                    }
+                });
+
+                ciclo++;
+            } while (ciclo < criterioParo);
+
+            DateTime después = DateTime.Now;
+            TimeSpan total = después - antes;
+            string tiempo = total.TotalSeconds.ToString();
+            
+            await GuardarDatosExcel(mejorAptitud, tiempo);
         }
 
         private void ObtenerDistancias()
