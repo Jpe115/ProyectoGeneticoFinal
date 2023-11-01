@@ -26,13 +26,18 @@ namespace ProyectoGeneticoFinal
     enum TipoCruzamiento
     {
         TPX,
-        OPX
+        OPX,
+        OBX,
+        PPX,
+        OSX
     }
 
     enum TipoMutación
     {
         Swap,
-        HSwap
+        HSwap,
+        Switch,
+        Insert
     }
 
     public partial class MainWindow : Window
@@ -314,11 +319,32 @@ namespace ProyectoGeneticoFinal
                         TwoPointCrossover(false, -1, valoresS1yS2, pob, pobContraria);
                         return true;
                     }
-                    else
+                    else if (cruzamiento == TipoCruzamiento.OPX)
                     {
                         int S1 = rand.Next(3, cantidadPuntos - 3);
                         OnePointCrossover(true, 1, S1, pob, pobContraria);
                         OnePointCrossover(false, -1, S1, pob, pobContraria);
+                        return true;
+                    }
+                    else if (cruzamiento == TipoCruzamiento.OBX)
+                    {
+                        var máscara = CrearMáscara();
+                        OrderBaseCrossover(true, 1, máscara, pob, pobContraria);
+                        OrderBaseCrossover(false, -1, máscara, pob, pobContraria);
+                        return true;
+                    }
+                    else if (cruzamiento == TipoCruzamiento.PPX)
+                    {
+                        var máscara = CrearMáscara();
+                        PrecedencePreservativeCrossover(true, 1, máscara, pob, pobContraria);
+                        PrecedencePreservativeCrossover(false, -1, máscara, pob, pobContraria);
+                        return true;
+                    }
+                    else
+                    {
+                        int[] puntos = ObtenerS1yS2();
+                        OrderSegmentCrossover(true, 1, puntos, pob, pobContraria);
+                        OrderSegmentCrossover(false, -1, puntos, pob, pobContraria);
                         return true;
                     }
                 }
@@ -333,36 +359,144 @@ namespace ProyectoGeneticoFinal
             }
         }
 
-        private void OnePointCrossover(bool esPar, int intercambio, int punto, int[,] pob, int[,] pobContraria)
+        private void OrderSegmentCrossover(bool esPar, int intercambio, int[] puntos, int[,] pob, int[,] pobContraria)
         {
             int parImpar = esPar ? 0 : 1;
 
-            //LLenar desde el padre 1 al hijo
             for (int a = parImpar; a < cantPoblación; a += 2)
             {
+                List<int> dígitosAgregados = new();
                 //LLenar desde el padre 1 al hijo
-                for (int b = 1; b <= punto; b++)
+                for (int b = 1; b <= puntos[0]; b++)
                 {
-                    //Pasar todos los elementos del padre 1 dentro de los rangos, al hijo
+                    //Pasar todos los elementos del padre 1 dentro del rango al hijo
                     pob[a, b] = pobContraria[a, b];
+                    dígitosAgregados.Add(pob[a, b]);
                 }
 
-                //Verificar que no sea duplicado                
-                int fila = a + intercambio;
+                //Verificar que no sea duplicado para pasar desde el padre 2             
                 int columna = 1;
 
-                for (int b = 2; b < cantidadPuntos; b++)
+                for (int b = puntos[0] + 1; b <= puntos[1]; b++)
                 {
-                    if (!(b <= punto))
+                    bool bandera = false;
+                    while (bandera == false && columna < cantidadPuntos)
+                    {
+                        if (!dígitosAgregados.Contains(pobContraria[a + intercambio, columna]))
+                        {
+                            pob[a, b] = pobContraria[a + intercambio, columna];
+                            dígitosAgregados.Add(pob[a, b]);
+                            bandera = true;
+                        }
+                        else
+                        {
+                            columna++;
+                        }
+                    }
+                    columna++;
+                }
+
+                int columnaPadre1 = puntos[0] + 1;
+                //Pasar los números restantes desde el padre 1
+                for (int b = puntos[1] + 1; b < cantidadPuntos; b++)
+                {
+                    bool bandera = false;
+                    while (bandera == false && columnaPadre1 < cantidadPuntos)
+                    {
+                        if (!dígitosAgregados.Contains(pobContraria[a, columnaPadre1]))
+                        {
+                            pob[a, b] = pobContraria[a, columnaPadre1];
+                            bandera = true;
+                        }
+                        else
+                        {
+                            columnaPadre1++;
+                        }
+                    }
+                    columnaPadre1++;
+                }
+            }
+        }
+
+        private void PrecedencePreservativeCrossover(bool esPar, int intercambio, int[] máscara, int[,] pob, int[,] pobContraria)
+        {
+            int parImpar = esPar ? 0 : 1;
+
+            for (int a = parImpar; a < cantPoblación; a += 2)
+            {
+                List<int> dígitosAgregados = new();
+                int columnaPadre1 = 1;
+                int columnaPadre2 = 1;
+
+                for (int b = 1; b < cantidadPuntos; b++)
+                {
+                    if (máscara[b - 1] == 1)
+                    {
+                        bool bandera = false;
+                        while (bandera == false && columnaPadre1 < cantidadPuntos)
+                        {
+                            if (!dígitosAgregados.Contains(pobContraria[a, columnaPadre1]))
+                            {
+                                pob[a, b] = pobContraria[a, columnaPadre1];
+                                dígitosAgregados.Add(pob[a, b]);
+                                bandera = true;
+                            }
+                            else
+                            {
+                                columnaPadre1++;
+                            }
+                        }
+                        columnaPadre1++;
+                    }
+                    else
+                    {
+                        bool bandera = false;
+                        while (bandera == false && columnaPadre2 < cantidadPuntos)
+                        {
+                            if (!dígitosAgregados.Contains(pobContraria[a + intercambio, columnaPadre2]))
+                            {
+                                pob[a, b] = pobContraria[a + intercambio, columnaPadre2];
+                                dígitosAgregados.Add(pob[a, b]);
+                                bandera = true;
+                            }
+                            else
+                            {
+                                columnaPadre2++;
+                            }
+                        }
+                        columnaPadre2++;
+                    }
+                }
+            }
+        }
+
+        private void OrderBaseCrossover(bool esPar, int intercambio, int[] máscara, int[,] pob, int[,] pobContraria)
+        {
+            int parImpar = esPar ? 0 : 1;
+
+            for (int a = parImpar; a < cantPoblación; a += 2)
+            {
+                List<int> dígitosAgregados = new();
+                for (int b = 1; b < cantidadPuntos; b++)
+                {
+                    if (máscara[b - 1] == 1)
+                    {
+                        pob[a, b] = pobContraria[a, b];
+                        dígitosAgregados.Add(pob[a, b]);
+                    }
+                }
+
+                int columna = 1;
+                for (int b = 1; b < cantidadPuntos; b++)
+                {
+                    if (máscara[b - 1] == 0)
                     {
                         bool bandera = false;
                         while (bandera == false && columna < cantidadPuntos)
                         {
-                            int valorActual = pobContraria[fila, columna];
-
-                            if (!EsDuplicado(a, valorActual, punto, pobContraria))
+                            if (!dígitosAgregados.Contains(pobContraria[a + intercambio, columna]))
                             {
-                                pob[a, b] = valorActual;
+                                pob[a, b] = pobContraria[a + intercambio, columna];
                                 bandera = true;
                             }
                             else
@@ -376,19 +510,54 @@ namespace ProyectoGeneticoFinal
             }
         }
 
-        private bool EsDuplicado(int a, int valor, int punto, int[,] pobContraria)
+        private int[] CrearMáscara()
         {
-            for (int col = 1; col <= punto; col++)
+            int[] máscara = new int[cantidadPuntos];
+            for (int i = 0; i < cantidadPuntos; i++)
             {
-                if (pobContraria[a, col] != 0)
+                int digito = rand.Next(0, 2);
+                máscara[i] = digito;
+            }
+            return máscara;
+        }
+
+        private void OnePointCrossover(bool esPar, int intercambio, int punto, int[,] pob, int[,] pobContraria)
+        {
+            int parImpar = esPar ? 0 : 1;
+
+            //LLenar desde el padre 1 al hijo
+            for (int a = parImpar; a < cantPoblación; a += 2)
+            {
+                List<int> dígitosAgregados = new();
+                //LLenar desde el padre 1 al hijo
+                for (int b = 1; b <= punto; b++)
                 {
-                    if (pobContraria[a, col] == valor)
+                    //Pasar todos los elementos del padre 1 dentro de los rangos, al hijo
+                    pob[a, b] = pobContraria[a, b];
+                    dígitosAgregados.Add(pob[a, b]);
+                }
+
+                //Verificar que no sea duplicado                
+                int columna = 1;
+
+                for (int b = punto + 1; b < cantidadPuntos; b++)
+                {
+                    bool bandera = false;
+                    while (bandera == false && columna < cantidadPuntos)
                     {
-                        return true;
+                        if (!dígitosAgregados.Contains(pobContraria[a + intercambio, columna]))
+                        {
+                            pob[a, b] = pobContraria[a + intercambio, columna];
+                            bandera = true;
+                        }
+                        else
+                        {
+                            columna++;
+                        }
                     }
+                    columna++;
                 }
             }
-            return false;
         }
 
         private int[] ObtenerS1yS2()
@@ -407,6 +576,7 @@ namespace ProyectoGeneticoFinal
             //LLenar desde el padre 1 al hijo
             for (int a = parImpar; a < cantPoblación; a += 2)
             {
+                List<int> dígitosAgregados = new();
                 //LLenar desde el padre 1 al hijo
                 for (int b = 1; b < cantidadPuntos + 2; b++)
                 {
@@ -414,54 +584,31 @@ namespace ProyectoGeneticoFinal
                     {
                         //Pasar todos los elementos del padre 1 dentro de los rangos, al hijo
                         pob[a, b] = pobContraria[a, b];
+                        dígitosAgregados.Add(pob[a, b]);
                     }
                 }
 
                 //Verificar que no sea duplicado                
-                int fila = a + intercambio;
                 int columna = 1;
 
-                for (int b = 2; b < cantidadPuntos; b++)
+                for (int b = valoresS1yS2[0] + 1; b < valoresS1yS2[1]; b++)
                 {
-                    if (!(b <= valoresS1yS2[0] || b >= valoresS1yS2[1]))
+                    bool bandera = false;
+                    while (bandera == false && columna < cantidadPuntos)
                     {
-                        bool bandera = false;
-                        while (bandera == false && columna < cantidadPuntos)
+                        if (!dígitosAgregados.Contains(pobContraria[a + intercambio, columna]))
                         {
-                            int valorActual = pobContraria[fila, columna];
-
-                            if (!EsDuplicado(a, valorActual, valoresS1yS2, pobContraria))
-                            {
-                                pob[a, b] = valorActual;
-                                bandera = true;
-                            }
-                            else
-                            {
-                                columna++;
-                            }
+                            pob[a, b] = pobContraria[a + intercambio, columna];
+                            bandera = true;
                         }
-                        columna++;
-                    }
-                }
-            }
-        }
-
-        private bool EsDuplicado(int a, int valor, int[] valoresS1yS2, int[,] pobContraria)
-        {
-            for (int col = 1; col < cantidadPuntos; col++)
-            {
-                if (pobContraria[a, col] != 0)
-                {
-                    if (col <= valoresS1yS2[0] || col >= valoresS1yS2[1])
-                    {
-                        if (pobContraria[a, col] == valor)
+                        else
                         {
-                            return true;
+                            columna++;
                         }
                     }
+                    columna++;
                 }
             }
-            return false;
         }
         #endregion
 
@@ -478,9 +625,19 @@ namespace ProyectoGeneticoFinal
                         MutaciónSwap(pob);
                         return true;
                     }
-                    else
+                    else if (mutación == TipoMutación.HSwap)
                     {
                         MutaciónHSwap(pob);
+                        return true;
+                    }
+                    else if (mutación == TipoMutación.Switch)
+                    {
+                        MutaciónSwitch(pob);
+                        return true;
+                    }
+                    else
+                    {
+                        MutaciónInsert(pob);
                         return true;
                     }
                 }
@@ -512,6 +669,32 @@ namespace ProyectoGeneticoFinal
                 int aux = pob[fila, punto];
                 pob[fila, punto] = pob[fila, punto + cantidadDePuntosEntre2];
                 pob[fila, punto + cantidadDePuntosEntre2] = aux;
+            }
+        }
+
+        private void MutaciónSwitch(int[,] pob)
+        {
+            for (int fila = 0; fila < cantPoblación; fila++)
+            {
+                int punto = rand.Next(1, cantidadPuntos - 2);
+                int aux = pob[fila, punto];
+                pob[fila, punto] = pob[fila, punto + 1];
+                pob[fila, punto + 1] = aux;
+            }
+        }
+
+        private void MutaciónInsert(int[,] pob)
+        {
+            for (int fila = 0; fila < cantPoblación; fila++)
+            {
+                int[] N1yN2 = ObtenerS1yS2();
+                int aux = pob[fila, N1yN2[0]];
+
+                for (int columna = N1yN2[0]; columna < N1yN2[1]; columna++)
+                {
+                    pob[fila, columna] = pob[fila, columna + 1];
+                }
+                pob[fila, N1yN2[1]] = aux;
             }
         }
         #endregion
