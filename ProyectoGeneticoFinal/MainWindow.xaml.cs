@@ -115,25 +115,20 @@ namespace ProyectoGeneticoFinal
                     break;
                 case 4: cruzamiento = TipoCruzamiento.OSX;
                     break;
-            }
-            if (opcionesCruzamiento == 0)
-            {
-                cruzamiento = TipoCruzamiento.TPX;
-            }
-            else
-            {
-                cruzamiento = TipoCruzamiento.OPX;
-            }
+            }            
             probCruzamiento = opcionesProbCruzamiento;
-            
-            if (opcionesMutación == 0)
+
+            switch (opcionesMutación)
             {
-                mutación = TipoMutación.Swap;
-            }
-            else
-            {
-                mutación = TipoMutación.HSwap;
-            }
+                case 0: mutación = TipoMutación.Swap;
+                    break;
+                case 1: mutación = TipoMutación.HSwap;
+                    break;
+                case 2: mutación = TipoMutación.Switch;
+                    break;
+                case 3: mutación = TipoMutación.Insert;
+                    break;
+            }            
             probMutación = opcionesProbMutación;            
 
             mejorAptitud = 999999999;
