@@ -736,7 +736,7 @@ namespace ProyectoGeneticoFinal
 
         private async Task GuardarDatosExcel(int aptitud, string tiempo, int columna, int fila)
         {
-            string rutaArchivo = "D:\\Escuela\\7 Semestre\\Algoritmos metaheuristicos\\Experimento_AG.xlsx";
+            string rutaArchivo = "D:\\Escuela\\7 Semestre\\Algoritmos metaheuristicos\\Experimento_final.xlsx";
 
             using (var package = new ExcelPackage(new FileInfo(rutaArchivo)))
             {
