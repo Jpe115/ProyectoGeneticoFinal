@@ -74,11 +74,11 @@ namespace ProyectoGeneticoFinal
             int fila = 5;
             for (int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
             {
-                for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 1; opcionesCruzamiento++)
+                for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 4; opcionesCruzamiento++)
                 {
                     for (int opcionesProbCruzamiento = 80; opcionesProbCruzamiento <= 90; opcionesProbCruzamiento+=10)
                     {
-                        for (int opcionesMutación = 0; opcionesMutación <= 1; opcionesMutación++)
+                        for (int opcionesMutación = 0; opcionesMutación <= 3; opcionesMutación++)
                         {
                             for (int opcionesProbMutación = 20; opcionesProbMutación <= 30; opcionesProbMutación += 10)
                             {
@@ -102,6 +102,20 @@ namespace ProyectoGeneticoFinal
             int ciclo = 0;
 
             cantPoblación = opcionesPoblación;
+
+            switch (opcionesCruzamiento)
+            {
+                case 0: cruzamiento = TipoCruzamiento.TPX;
+                    break; 
+                case 1: cruzamiento = TipoCruzamiento.OPX;
+                    break;
+                case 2: cruzamiento = TipoCruzamiento.OBX; 
+                    break;
+                case 3: cruzamiento = TipoCruzamiento.PPX; 
+                    break;
+                case 4: cruzamiento = TipoCruzamiento.OSX;
+                    break;
+            }
             if (opcionesCruzamiento == 0)
             {
                 cruzamiento = TipoCruzamiento.TPX;
@@ -111,6 +125,7 @@ namespace ProyectoGeneticoFinal
                 cruzamiento = TipoCruzamiento.OPX;
             }
             probCruzamiento = opcionesProbCruzamiento;
+            
             if (opcionesMutación == 0)
             {
                 mutación = TipoMutación.Swap;
