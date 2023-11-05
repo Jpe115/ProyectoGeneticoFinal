@@ -72,7 +72,7 @@ namespace ProyectoGeneticoFinal
             await Task.Run(ObtenerDistancias);
 
             int fila = 5;
-            for (int opcionesPoblación = 500; opcionesPoblación <= 1000; opcionesPoblación+=500)
+            for (int opcionesPoblación = 500; opcionesPoblación <= 2000; opcionesPoblación+=500)
             {
                 for(int opcionesCruzamiento = 0; opcionesCruzamiento <= 4; opcionesCruzamiento++)
                 {
