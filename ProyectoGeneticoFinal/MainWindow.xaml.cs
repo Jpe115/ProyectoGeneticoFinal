@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Newtonsoft.Json;
 using System.IO;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace ProyectoGeneticoFinal
 {
@@ -726,9 +727,9 @@ namespace ProyectoGeneticoFinal
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Archivo no válido", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -751,11 +752,37 @@ namespace ProyectoGeneticoFinal
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Archivos JSON|*.json|Todos los archivos|*.*";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                await LeerPuntos(openFileDialog.FileName);
+            }
+            else
+            {
+                MessageBox.Show("No se seleccionó ningún archivo.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void a()
+        {
             bool lecturaHecha = await LeerPuntos();
             if (lecturaHecha == false)
             {
-                MessageBox.Show("No se ha encontrado una lista de ciudades", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                App.Current.Shutdown();
+                MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "Archivos JSON|*.json|Todos los archivos|*.*";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    await LeerPuntos(openFileDialog.FileName);
+                }
+                else
+                {
+                    MessageBox.Show("No se seleccionó ningún archivo.");
+                }
             }
         }
     }
