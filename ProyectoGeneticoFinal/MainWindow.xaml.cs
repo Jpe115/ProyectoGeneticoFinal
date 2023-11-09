@@ -709,9 +709,8 @@ namespace ProyectoGeneticoFinal
         }
         #endregion
 
-        private async Task<bool> LeerPuntos()
+        private async Task<bool> LeerPuntos(string nombreArchivo = "D:\\Documentos\\Visual Studio\\ProyectoGenetico\\ProyectoGenetico\\bin\\Debug\\net7.0-windows10.0.17763.0\\CoordenadasGuardadas.json")
         {
-            string nombreArchivo = "D:\\Documentos\\Visual Studio\\ProyectoGenetico\\ProyectoGenetico\\bin\\Debug\\net7.0-windows10.0.17763.0\\CoordenadasGuardadas.json";
             try
             {
                 if (File.Exists(nombreArchivo))
