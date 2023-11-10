@@ -17,6 +17,8 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Threading;
 using Microsoft.Win32;
+using ProyectoGeneticoFinal.Properties;
+//using System.Configuration;
 
 namespace ProyectoGeneticoFinal
 {
@@ -721,6 +723,9 @@ namespace ProyectoGeneticoFinal
 
                     if (listaCoordenadas != null)
                     {
+                        Settings.Default.RutaCoordenadas = nombreArchivo;
+                        Settings.Default.Save();
+
                         coordenadas = listaCoordenadas;
                         return true;
                     }
@@ -752,24 +757,15 @@ namespace ProyectoGeneticoFinal
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Archivos JSON|*.json|Todos los archivos|*.*";
-
-            if (openFileDialog.ShowDialog() == true)
+            if (string.IsNullOrEmpty(Settings.Default.RutaCoordenadas))
             {
-                await LeerPuntos(openFileDialog.FileName);
-            }
-            else
-            {
-                MessageBox.Show("No se seleccionó ningún archivo.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await SolicitudCoordenadas();
             }
         }
 
-        private async void a()
-        {
-            bool lecturaHecha = await LeerPuntos();
-            if (lecturaHecha == false)
+        private async Task SolicitudCoordenadas()
+        {            
+            if (!await LeerPuntos())
             {
                 MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
                 OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -783,7 +779,7 @@ namespace ProyectoGeneticoFinal
                 {
                     MessageBox.Show("No se seleccionó ningún archivo.");
                 }
-            }
+            }            
         }
     }
 }
