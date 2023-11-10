@@ -741,7 +741,7 @@ namespace ProyectoGeneticoFinal
 
         private async Task GuardarDatosExcel(int aptitud, string tiempo, int columna, int fila)
         {
-            string rutaArchivo = "D:\\Escuela\\7 Semestre\\Algoritmos metaheuristicos\\Experimento_final.xlsx";
+            string rutaArchivo = Settings.Default.RutaExcel;
 
             using (var package = new ExcelPackage(new FileInfo(rutaArchivo)))
             {
@@ -760,6 +760,10 @@ namespace ProyectoGeneticoFinal
             if (string.IsNullOrEmpty(Settings.Default.RutaCoordenadas))
             {
                 await SolicitudCoordenadas();
+            }
+            if(string.IsNullOrEmpty(Settings.Default.RutaExcel))
+            {
+                SolicitudExcel();
             }
         }
 
@@ -780,6 +784,35 @@ namespace ProyectoGeneticoFinal
                     MessageBox.Show("No se seleccionó ningún archivo.");
                 }
             }            
+        }
+
+        private void SolicitudExcel()
+        {
+            if (!RevisarExcel())
+            {
+                MessageBox.Show("Seleccione el archivo Excel donde se guardarán los datos", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "Archivos EXCEl|*.xlsx|Todos los archivos|*.*";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.RutaExcel = openFileDialog.FileName;
+                    Settings.Default.Save();
+                }
+                else
+                {
+                    MessageBox.Show("No se seleccionó ningún archivo.");
+                }
+            }
+        }
+
+        private bool RevisarExcel()
+        {
+            if (File.Exists(Settings.Default.RutaExcel))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
