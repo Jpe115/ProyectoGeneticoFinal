@@ -712,7 +712,7 @@ namespace ProyectoGeneticoFinal
         }
         #endregion
 
-        private async Task<bool> LeerPuntos(string nombreArchivo = "D:\\Documentos\\Visual Studio\\ProyectoGenetico\\ProyectoGenetico\\bin\\Debug\\net7.0-windows10.0.17763.0\\CoordenadasGuardadas.json")
+        private async Task<bool> LeerPuntos(string nombreArchivo)
         {
             try
             {
@@ -761,48 +761,50 @@ namespace ProyectoGeneticoFinal
             {
                 await SolicitudCoordenadas();
             }
+            else if (await LeerPuntos(Settings.Default.RutaCoordenadas) == false)
+            {
+                await SolicitudCoordenadas();
+            }
             if(string.IsNullOrEmpty(Settings.Default.RutaExcel))
+            {
+                SolicitudExcel();
+            }
+            else if (RevisarExcel() == false)
             {
                 SolicitudExcel();
             }
         }
 
         private async Task SolicitudCoordenadas()
-        {            
-            if (!await LeerPuntos())
-            {
-                MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Archivos JSON|*.json|Todos los archivos|*.*";
+        {
+            MessageBox.Show("Seleccione una lista de ciudades", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Archivos JSON|*.json|Todos los archivos|*.*";
 
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    await LeerPuntos(openFileDialog.FileName);
-                }
-                else
-                {
-                    MessageBox.Show("No se seleccionó ningún archivo.");
-                }
-            }            
+            if (openFileDialog.ShowDialog() == true)
+            {
+                await LeerPuntos(openFileDialog.FileName);
+            }
+            else
+            {
+                MessageBox.Show("No se seleccionó ningún archivo.");
+            }
         }
 
         private void SolicitudExcel()
         {
-            if (!RevisarExcel())
-            {
-                MessageBox.Show("Seleccione el archivo Excel donde se guardarán los datos", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Archivos EXCEl|*.xlsx|Todos los archivos|*.*";
+            MessageBox.Show("Seleccione el archivo Excel donde se guardarán los datos", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Archivos EXCEl|*.xlsx|Todos los archivos|*.*";
 
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    Settings.Default.RutaExcel = openFileDialog.FileName;
-                    Settings.Default.Save();
-                }
-                else
-                {
-                    MessageBox.Show("No se seleccionó ningún archivo.");
-                }
+            if (openFileDialog.ShowDialog() == true)
+            {
+                Settings.Default.RutaExcel = openFileDialog.FileName;
+                Settings.Default.Save();
+            }
+            else
+            {
+                MessageBox.Show("No se seleccionó ningún archivo.");
             }
         }
 
