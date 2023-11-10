@@ -788,6 +788,7 @@ namespace ProyectoGeneticoFinal
             else
             {
                 MessageBox.Show("No se seleccionó ningún archivo.");
+                btnEjecutar.IsEnabled = false;
             }
         }
 
@@ -795,7 +796,7 @@ namespace ProyectoGeneticoFinal
         {
             MessageBox.Show("Seleccione el archivo Excel donde se guardarán los datos", "Advertencia", MessageBoxButton.OK, MessageBoxImage.Information);
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Archivos EXCEl|*.xlsx|Todos los archivos|*.*";
+            openFileDialog.Filter = "Archivos EXCEL|*.xlsx|Todos los archivos|*.*";
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -805,6 +806,7 @@ namespace ProyectoGeneticoFinal
             else
             {
                 MessageBox.Show("No se seleccionó ningún archivo.");
+                btnEjecutar.IsEnabled = false;
             }
         }
 
