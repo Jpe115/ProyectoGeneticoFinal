@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Win32;
 using ProyectoGeneticoFinal.Properties;
+using System.Diagnostics;
 //using System.Configuration;
 
 namespace ProyectoGeneticoFinal
@@ -98,7 +99,22 @@ namespace ProyectoGeneticoFinal
             }
             Cursor = Cursors.Arrow;
             btnEjecutar.IsEnabled = true;
-            MessageBox.Show("¿Desea abrir el archivo resultante?", "Proceso terminado", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var respuesta = MessageBox.Show("¿Desea abrir el archivo resultante?", "Proceso terminado", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (respuesta == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = Settings.Default.RutaExcel,
+                        UseShellExecute = true // Usa la aplicación predeterminada para el tipo de archivo
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al intentar abrir el archivo: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private async Task EjecutarAlgoritmo(int opcionesPoblación, int opcionesCruzamiento, 
