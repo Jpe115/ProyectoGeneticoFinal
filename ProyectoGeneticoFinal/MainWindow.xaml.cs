@@ -72,6 +72,7 @@ namespace ProyectoGeneticoFinal
         private async void btnEjecutar_Click(object sender, RoutedEventArgs e)
         {
             Cursor = Cursors.Wait;
+            btnEjecutar.IsEnabled = false;
             await Task.Run(ObtenerDistancias);
 
             int fila = 5;
@@ -96,6 +97,7 @@ namespace ProyectoGeneticoFinal
                 }
             }
             Cursor = Cursors.Arrow;
+            btnEjecutar.IsEnabled = true;
             MessageBox.Show("¿Desea abrir el archivo resultante?", "Proceso terminado", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
 
